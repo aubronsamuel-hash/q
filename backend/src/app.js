@@ -2,7 +2,6 @@
 const express = require('express');
 const cors = require('cors');
 
-const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 const milestoneRoutes = require('./routes/milestones');
@@ -17,11 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 // Register API routes
-app.use('/auth', authRoutes);
 app.use('/projects', projectRoutes);
-app.use('/tasks', taskRoutes);
-app.use('/milestones', milestoneRoutes);
-app.use('/timelogs', timeLogRoutes);
+app.use(taskRoutes);
+app.use(milestoneRoutes);
+app.use(timeLogRoutes);
 
 // Basic error handler
 // underscore prefix to indicate unused `next` parameter
@@ -31,3 +29,4 @@ app.use((err, req, res, _next) => {
 });
 
 module.exports = app;
+
