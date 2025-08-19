@@ -1,4 +1,5 @@
 const express = require('express');
+const authorizeRole = require('../middleware/authorizeRole');
 
 module.exports = (models) => {
   const router = express.Router();
@@ -29,8 +30,8 @@ module.exports = (models) => {
     }
   });
 
-  // POST /projects - create a new project
-  router.post('/', async (req, res) => {
+  // POST /projects - create a new project (admin only)
+  router.post('/', authorizeRole('admin'), async (req, res) => {
     try {
       const project = await Project.create(req.body);
       res.status(201).json(project);
@@ -39,8 +40,8 @@ module.exports = (models) => {
     }
   });
 
-  // PUT /projects/:id - update an existing project
-  router.put('/:id', async (req, res) => {
+  // PUT /projects/:id - update an existing project (admin only)
+  router.put('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const project = await Project.findByPk(req.params.id);
       if (!project) {
@@ -53,8 +54,8 @@ module.exports = (models) => {
     }
   });
 
-  // PATCH /projects/:id - partially update a project
-  router.patch('/:id', async (req, res) => {
+  // PATCH /projects/:id - partially update a project (admin only)
+  router.patch('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const project = await Project.findByPk(req.params.id);
       if (!project) {
@@ -67,8 +68,8 @@ module.exports = (models) => {
     }
   });
 
-  // DELETE /projects/:id - remove a project
-  router.delete('/:id', async (req, res) => {
+  // DELETE /projects/:id - remove a project (admin only)
+  router.delete('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const project = await Project.findByPk(req.params.id);
       if (!project) {
@@ -86,7 +87,12 @@ module.exports = (models) => {
     try {
       const tasks = await Task.findAll({
         where: { projectId: req.params.projectId },
-        include: [{ model: TimeLog, include: [User] }],
+        include: [
+          {
+            model: TimeLog,
+            include: [{ model: User, attributes: { exclude: ['password'] } }],
+          },
+        ],
       });
 
       let totalHours = 0;

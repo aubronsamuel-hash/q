@@ -1,4 +1,5 @@
 const express = require('express');
+const authorizeRole = require('../middleware/authorizeRole');
 
 module.exports = (models) => {
   const { Milestone } = models;
@@ -16,8 +17,8 @@ module.exports = (models) => {
     }
   });
 
-  // POST /projects/:projectId/milestones - create a milestone for a project
-  projectRouter.post('/', async (req, res) => {
+  // POST /projects/:projectId/milestones - create a milestone for a project (admin only)
+  projectRouter.post('/', authorizeRole('admin'), async (req, res) => {
     try {
       const milestone = await Milestone.create({ ...req.body, projectId: req.params.projectId });
       res.status(201).json(milestone);
@@ -29,8 +30,8 @@ module.exports = (models) => {
   // Router for endpoints under /milestones
   const milestoneRouter = express.Router();
 
-  // PUT /milestones/:id - update a milestone
-  milestoneRouter.put('/:id', async (req, res) => {
+  // PUT /milestones/:id - update a milestone (admin only)
+  milestoneRouter.put('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const milestone = await Milestone.findByPk(req.params.id);
       if (!milestone) {
@@ -43,8 +44,8 @@ module.exports = (models) => {
     }
   });
 
-  // PATCH /milestones/:id - partially update a milestone
-  milestoneRouter.patch('/:id', async (req, res) => {
+  // PATCH /milestones/:id - partially update a milestone (admin only)
+  milestoneRouter.patch('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const milestone = await Milestone.findByPk(req.params.id);
       if (!milestone) {
@@ -57,8 +58,8 @@ module.exports = (models) => {
     }
   });
 
-  // DELETE /milestones/:id - remove a milestone
-  milestoneRouter.delete('/:id', async (req, res) => {
+  // DELETE /milestones/:id - remove a milestone (admin only)
+  milestoneRouter.delete('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const milestone = await Milestone.findByPk(req.params.id);
       if (!milestone) {
