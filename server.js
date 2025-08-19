@@ -1,6 +1,7 @@
 const express = require('express');
 const { Sequelize } = require('sequelize');
 const initModels = require('./models');
+const authMiddleware = require('./middleware/authMiddleware');
 
 // Create Express application
 const app = express();
@@ -32,12 +33,20 @@ sequelize
   .then(() => console.log('Database synchronized'))
   .catch((err) => console.error('Database synchronization failed:', err));
 
-// Import and mount routers
+// Import routers
+const authRoutes = require('./routes/authRoutes')(models);
 const projectRoutes = require('./routes/projectRoutes')(models);
 const taskRoutes = require('./routes/taskRoutes')(models);
 const milestoneRoutes = require('./routes/milestoneRoutes')(models);
 const timeLogRoutes = require('./routes/timeLogRoutes')(models);
 
+// Public authentication routes
+app.use('/auth', authRoutes);
+
+// Apply authentication middleware to all routes below
+app.use(authMiddleware);
+
+// Protected resource routes
 app.use('/projects', projectRoutes);
 app.use('/projects/:projectId/tasks', taskRoutes.projectRouter);
 app.use('/tasks', taskRoutes.taskRouter);

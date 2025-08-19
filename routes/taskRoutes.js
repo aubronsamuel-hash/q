@@ -1,4 +1,5 @@
 const express = require('express');
+const authorizeRole = require('../middleware/authorizeRole');
 
 module.exports = (models) => {
   const { Task } = models;
@@ -16,8 +17,8 @@ module.exports = (models) => {
     }
   });
 
-  // POST /projects/:projectId/tasks - create a new task in a project
-  projectRouter.post('/', async (req, res) => {
+  // POST /projects/:projectId/tasks - create a new task in a project (admin only)
+  projectRouter.post('/', authorizeRole('admin'), async (req, res) => {
     try {
       const task = await Task.create({ ...req.body, projectId: req.params.projectId });
       res.status(201).json(task);
@@ -29,36 +30,39 @@ module.exports = (models) => {
   // Router for endpoints under /tasks
   const taskRouter = express.Router();
 
-  // PUT /tasks/:id - update a task
-  taskRouter.put('/:id', async (req, res) => {
+  // Shared handler for updating tasks with authorization rules
+  const handleUpdate = async (req, res) => {
     try {
       const task = await Task.findByPk(req.params.id);
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
       }
-      await task.update(req.body);
-      res.json(task);
-    } catch (err) {
-      res.status(400).json({ error: 'Failed to update task' });
-    }
-  });
 
-  // PATCH /tasks/:id - partially update a task
-  taskRouter.patch('/:id', async (req, res) => {
-    try {
-      const task = await Task.findByPk(req.params.id);
-      if (!task) {
-        return res.status(404).json({ error: 'Task not found' });
+      // Admins can update any field
+      if (req.user.role === 'admin') {
+        await task.update(req.body);
+        return res.json(task);
       }
-      await task.update(req.body);
-      res.json(task);
-    } catch (err) {
-      res.status(400).json({ error: 'Failed to update task' });
-    }
-  });
 
-  // DELETE /tasks/:id - remove a task
-  taskRouter.delete('/:id', async (req, res) => {
+      // Standard users can only modify their own tasks and only status
+      if (task.assignedUserId !== req.user.id) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+      await task.update({ status: req.body.status });
+      return res.json(task);
+    } catch (err) {
+      return res.status(400).json({ error: 'Failed to update task' });
+    }
+  };
+
+  // PUT /tasks/:id - update a task (status only for owners)
+  taskRouter.put('/:id', handleUpdate);
+
+  // PATCH /tasks/:id - partially update a task (status only for owners)
+  taskRouter.patch('/:id', handleUpdate);
+
+  // DELETE /tasks/:id - remove a task (admin only)
+  taskRouter.delete('/:id', authorizeRole('admin'), async (req, res) => {
     try {
       const task = await Task.findByPk(req.params.id);
       if (!task) {
