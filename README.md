@@ -36,6 +36,23 @@ The backend expects the following variables in a `.env` file:
 - `JWT_SECRET` – secret key used to sign JSON Web Tokens
 - `PORT` – port for the HTTP server (defaults to `4000` if not set)
 
+### Promote a user to admin
+
+Promote an existing account to administrator with a direct SQL query or the helper script.
+
+**SQL (PostgreSQL):**
+
+```sql
+UPDATE "Users" SET role='admin' WHERE email='user@example.com';
+```
+
+**NPM script:**
+
+```bash
+cd backend
+npm run promote:admin -- user@example.com
+```
+
 ## Frontend
 
 1. Navigate to the frontend folder:
