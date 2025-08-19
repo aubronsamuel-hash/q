@@ -28,6 +28,14 @@ This repository contains a minimal, production-ready scaffold split into two fol
    npm run lint
    ```
 
+### Environment variables
+
+The backend expects the following variables in a `.env` file:
+
+- `DATABASE_URL` – connection string for PostgreSQL
+- `JWT_SECRET` – secret key used to sign JSON Web Tokens
+- `PORT` – port for the HTTP server (defaults to `4000` if not set)
+
 ## Frontend
 
 1. Navigate to the frontend folder:
@@ -50,5 +58,11 @@ This repository contains a minimal, production-ready scaffold split into two fol
    ```bash
    npm run build
    ```
+
+### Environment variables
+
+Create a `.env` file with:
+
+- `REACT_APP_API_URL` – base URL of the backend API (e.g. `http://localhost:4000`)
 
 Both applications use environment variables and are ready for further development.

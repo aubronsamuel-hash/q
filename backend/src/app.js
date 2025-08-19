@@ -17,6 +17,11 @@ app.use(cors());
 // Parse incoming JSON bodies
 app.use(express.json());
 
+// Simple health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // Public auth routes
 app.use('/auth', authRoutes);
 

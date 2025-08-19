@@ -8,11 +8,16 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL;
  * @param {object} options Fetch options
  * @param {string} token JWT token
  */
-export async function apiFetch(path, options = {}, token) {
+export async function apiFetch(path, options = {}, token, onUnauthorized) {
   const headers = options.headers ? { ...options.headers } : {};
   if (token) {
     // Include bearer token for authenticated requests
     headers['Authorization'] = `Bearer ${token}`;
   }
-  return fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  const res = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  if (res.status === 401 && typeof onUnauthorized === 'function') {
+    // If the server reports unauthorized, force logout
+    onUnauthorized();
+  }
+  return res;
 }
