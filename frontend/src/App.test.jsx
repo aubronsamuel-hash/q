@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { render, screen } from "@testing-library/react";
+import App from "./App";
 
-// Basic placeholder test to ensure Playwright runs
-test('dummy test passes', () => {
-  expect(true).toBe(true);
+test("renders navbar title", () => {
+  render(<App />);
+  expect(screen.getByText(/Project Manager/i)).toBeInTheDocument();
 });

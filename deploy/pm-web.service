@@ -1,0 +1,13 @@
+[Unit]
+Description=Project Management Web
+After=network.target
+
+[Service]
+Type=simple
+User=pm
+WorkingDirectory=/opt/pm/frontend
+ExecStart=/usr/bin/npx serve -s /opt/pm/frontend/build -l 3000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
