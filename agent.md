@@ -1,143 +1,93 @@
-Objectif
-
-Construire une application web complète de gestion de projets avec :
-
-Planification de projets
-
-Gestion de missions (tâches)
-
-Comptabilité (suivi du temps, coûts des missions)
-
-Authentification et rôles (admin / user)
-
-Interface utilisateur en React
-
-Stack technique
-
-Backend : Node.js, Express, Sequelize (PostgreSQL)
-
-Frontend : React (React Router, Hooks, fetch/axios)
-
-Auth : JWT (JSON Web Token), bcrypt
-
-Étape 1 : Base de Données (PostgreSQL + Sequelize)
-
-Créer les modèles Sequelize :
-
-User (id, name, email, password hash, role, hourlyRate)
-
-Project (id, name, description, startDate, dueDate)
-
-Milestone (id, projectId, title, description, dueDate)
-
-Task (id, projectId, milestoneId, title, description, status, assignedUserId, dueDate)
-
-TimeLog (id, taskId, userId, hours, date)
-
-Définir les relations :
-
-Project → hasMany → Task
-
-Project → hasMany → Milestone
-
-Task → belongsTo → Project
-
-Task → belongsTo → Milestone
-
-Task → belongsTo → User (assignedUser)
-
-User → hasMany → Task
-
-User → hasMany → TimeLog
-
-Task → hasMany → TimeLog
-
-Commenter chaque modèle et relation en anglais.
-
-Étape 2 : API REST (Express + Sequelize)
-
-Créer un serveur Express (server.js).
-
-Configurer Sequelize et synchroniser la base (sequelize.sync()).
-
-Créer des routeurs séparés :
-
-/projects (CRUD projets)
-
-/tasks (CRUD tâches, statut, assignation)
-
-/milestones (CRUD jalons)
-
-/timelogs (ajout et lecture du temps passé)
-
-Ajouter un endpoint /projects/:id/cost pour calculer heures + coûts.
-
-Bien commenter le code et gérer les erreurs (404, 400, etc.).
-
-Étape 3 : Authentification & Autorisation
-
-Auth routes :
-
-POST /auth/register (créer user, hash password avec bcrypt)
-
-POST /auth/login (vérif email/pass, retour JWT signé)
-
-Middlewares :
-
-authMiddleware → vérifie JWT (Authorization: Bearer).
-
-authorizeRole(role) → bloque l’accès si rôle != requis.
-
-Règles d’accès :
-
-Admin → CRUD projets/jalons/tâches.
-
-User → peut voir projets/tâches, mettre à jour statut de ses propres tâches, enregistrer son temps.
-
-Admin → peut voir tous les TimeLogs.
-
-User → ne peut voir que ses TimeLogs.
-
-Étape 4 : Frontend React
-
-Créer un projet React (create-react-app).
-
-Utiliser React Router pour pages :
-
-/login → LoginPage (form email/pass → POST /auth/login).
-
-/register → RegisterPage (optionnel).
-
-/projects → ProjectListPage (liste projets).
-
-/projects/:id → ProjectDetailPage (détails projet, tâches, time logs, coûts).
-
-Composants principaux :
-
-Navbar (logout, user info).
-
-LoginPage (connexion).
-
-ProjectListPage (affichage + bouton créer projet si admin).
-
-ProjectDetailPage (affiche tâches + bouton terminer si assigné, ajout de temps, calcul du coût total).
-
-Formulaires : NewProjectForm, NewTaskForm, etc.
-
-Gestion d’authentification côté front :
-
-Stocker JWT dans localStorage.
-
-Créer un AuthContext pour partager état user/token.
-
-Protéger les routes (RequireAuth).
-
-Étape 5 : Améliorations possibles
-
-Générer un rapport PDF des coûts/factures.
-
-Ajout d’un dashboard admin.
-
-Filtrage des projets par utilisateur.
-
-Notifications (emails, Telegram, etc.).
+You are Codex. Your mission is to generate a full project planning web application step by step.  
+Always follow exactly the instructions for each numbered step.  
+The stack is: Backend = Node.js + Express + Sequelize (PostgreSQL), Frontend = React (React Router, hooks), Auth = JWT + bcrypt.  
+All code must be clean, modular, in English, ASCII only, and commented in English.  
+Each step must produce working code before moving to the next.
+
+----------------------------------------------------------------
+STEP 1 – PROJECT SCAFFOLD
+----------------------------------------------------------------
+- Create backend/ and frontend/ folders
+- backend/: Express app with Sequelize config, models/, routes/, middleware/
+- frontend/: React app with React Router and placeholder pages
+- Provide package.json scripts and .env.example
+- Output folder tree and initial files with placeholders
+
+----------------------------------------------------------------
+STEP 2 – DATABASE MODELS
+----------------------------------------------------------------
+- Implement Sequelize models: User, Project, Milestone, Task, TimeLog
+- Add all fields and associations (Project→Task, Project→Milestone, Task→User, Task→TimeLog, etc.)
+- Configure cascade deletes where logical
+- Export sequelize instance in config/db.js
+- Ensure sync() works without error
+
+----------------------------------------------------------------
+STEP 3 – API ROUTES (NO AUTH)
+----------------------------------------------------------------
+- Create modular routers and controllers
+- Projects: CRUD + GET /:id with Tasks and Milestones
+- Tasks: CRUD inside project + update status
+- Milestones: CRUD
+- TimeLogs: GET/POST for a task
+- Cost endpoint: GET /projects/:id/cost returns { totalHours, totalCost }
+- Use proper HTTP codes, JSON only, comments included
+
+----------------------------------------------------------------
+STEP 4 – AUTHENTICATION & AUTHORIZATION
+----------------------------------------------------------------
+- Routes: POST /auth/register, POST /auth/login
+- Hash passwords with bcrypt, issue JWT with id+role
+- Middleware: auth.js (verify JWT), authorizeRole.js
+- Protect all routes except /auth/*
+- Admin only: CRUD on projects, tasks, milestones
+- Users: can only update their own assigned tasks, post their own timelogs
+- Never return password hashes
+
+----------------------------------------------------------------
+STEP 5 – FRONTEND SCAFFOLD
+----------------------------------------------------------------
+- React app with Router
+- Pages: /login, /register (optional), /projects, /projects/:id
+- Components: Navbar, ProtectedRoute
+- Context: AuthContext to store { user, token }
+- api.js helper to call backend with Authorization header
+- Simple UI (forms, lists), no CSS framework required
+
+----------------------------------------------------------------
+STEP 6 – FRONTEND PAGES IMPLEMENTATION
+----------------------------------------------------------------
+- LoginPage: login form, save token+user to context, redirect to /projects
+- ProjectListPage: list projects, create project form visible only to admin
+- ProjectDetailPage: show project info, tasks, milestones, totals
+  - Admin: add tasks
+  - Assigned user: change status, log time
+- RegisterPage: form to create a new account (optional)
+
+----------------------------------------------------------------
+STEP 7 – FINAL CONFIG
+----------------------------------------------------------------
+- Backend: add CORS, .env loading, /health endpoint
+- Scripts: "dev" = nodemon, "start" = node server.js
+- Frontend: use REACT_APP_API_URL, handle 401 by redirect to /login
+- README.md with instructions to run backend + frontend
+
+----------------------------------------------------------------
+STEP 8 – TEST AUTOMATION
+----------------------------------------------------------------
+- Provide PowerShell script test_api.ps1
+  - Registers admin, promotes to admin
+  - Logs in, creates project+milestone
+  - Registers member, logs in
+  - Creates task assigned to member
+  - Member updates status, logs time, marks done
+  - Admin fetches project cost
+- Provide smoke test checklist for frontend UI
+
+----------------------------------------------------------------
+GENERAL RULES
+----------------------------------------------------------------
+- Always comment code in English
+- Never output secrets (only placeholders in .env.example)
+- Keep code modular and production-ready
+- Output each step completely before moving to the next
