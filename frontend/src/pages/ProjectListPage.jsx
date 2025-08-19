@@ -8,6 +8,7 @@ function ProjectListPage() {
   const { token, user, logout } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
 
   const loadProjects = async () => {
     try {
@@ -31,12 +32,13 @@ function ProjectListPage() {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ name, description })
         },
         token,
         logout
       );
       setName('');
+      setDescription('');
       loadProjects();
     } catch (err) {
       console.error(err);
@@ -55,8 +57,19 @@ function ProjectListPage() {
       </ul>
       {user?.role === 'admin' && (
         <form onSubmit={handleCreate}>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Project name" />
-          <button type="submit">Create</button>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+            data-testid="new-project-name"
+          />
+          <input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description"
+            data-testid="new-project-description"
+          />
+          <button type="submit" data-testid="create-project-btn">Create</button>
         </form>
       )}
     </div>

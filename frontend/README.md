@@ -62,3 +62,33 @@ Set environment variables so Playwright uses the system Chromium and skips downl
 export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 export PW_CHROMIUM_PATH="$(which chromium || which chromium-browser || which google-chrome)"
 ```
+
+## Playwright with system Chromium (no downloads)
+
+Install system Chromium and required libraries (Debian/Ubuntu):
+
+```
+apt-get update
+apt-get install -y chromium || apt-get install -y chromium-browser
+# libs may be required: libatk1.0-0[t64], libatk-bridge2.0-0[t64], libcups2[t64], libxkbcommon0, libatspi2.0-0[t64], libxcomposite1, libxdamage1, libxfixes3, libxrandr2, libgbm1, libasound2[t64]
+```
+
+Export variables so Playwright skips downloads and points to the system browser:
+
+```
+export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+export PW_CHROMIUM_PATH="/usr/bin/chromium"   # adjust if different
+```
+
+Run E2E tests:
+
+```
+npm --prefix frontend run e2e
+```
+
+Or run everything (deps, servers, tests):
+
+```
+chmod +x ./run_all_e2e_nodownload.sh
+./run_all_e2e_nodownload.sh
+```

@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { loginAs, getEnv } from './utils/auth';
+import { env, loginAs } from './utils/auth';
 
-const { apiBase } = getEnv();
-const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
-const adminPass = process.env.ADMIN_PASS || 'Admin123!';
+const { apiBase, baseURL, adminEmail, adminPass } = env();
 
 test('admin refreshes project detail and sees totals', async ({ page }) => {
-  await loginAs(page, { email: adminEmail, password: adminPass, apiBase });
+  await loginAs(page, adminEmail, adminPass, apiBase);
 
+  await page.goto(`${baseURL}/projects`);
   await page.getByRole('link', { name: 'E2E Project' }).click();
 
   const totalsText = await page.locator('p', { hasText: 'Total Hours' }).textContent();

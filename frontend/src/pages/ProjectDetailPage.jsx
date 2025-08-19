@@ -75,17 +75,20 @@ function ProjectDetailPage() {
         Total Hours: {cost.totalHours} | Total Cost: {cost.totalCost}
       </p>
 
-      <h2>Milestones</h2>
-      <ul>
-        {project.Milestones?.map((m) => (
-          <li key={m.id}>{m.name}</li>
-        ))}
-      </ul>
+      <section data-testid="milestones-section">
+        <h2>Milestones</h2>
+        <ul>
+          {project.Milestones?.map((m) => (
+            <li key={m.id}>{m.name}</li>
+          ))}
+        </ul>
+      </section>
 
-      <h2>Tasks</h2>
-      <ul>
-        {project.Tasks?.map((t) => (
-          <li key={t.id}>
+      <section data-testid="tasks-section">
+        <h2>Tasks</h2>
+        <ul>
+          {project.Tasks?.map((t) => (
+            <li key={t.id}>
             {t.title} - {t.status}
             {user && user.id === t.assignedUserId && (
               <div>
@@ -117,9 +120,10 @@ function ProjectDetailPage() {
                 </div>
               </div>
             )}
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

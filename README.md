@@ -226,6 +226,7 @@ npm --prefix frontend run e2e
 Alternatively, run the helper script which installs dependencies, starts services, and executes the E2E suite:
 
 ```bash
+chmod +x run_all_e2e_nodownload.sh
 ./run_all_e2e_nodownload.sh
 ```
 

@@ -1,33 +1,20 @@
-import type { Page } from '@playwright/test';
-
-/**
- * Programmatically log in a user by calling the backend and seeding localStorage.
- */
-export async function loginAs(
-  page: Page,
-  { email, password, apiBase }: { email: string; password: string; apiBase: string }
-) {
-  const res = await page.request.post(`${apiBase}/auth/login`, {
-    data: { email, password },
-  });
-  const { token, user } = await res.json();
-
-  await page.addInitScript(({ token, user }) => {
-    // Set auth object and individual keys used by the app
-    localStorage.setItem('auth', JSON.stringify({ token, user }));
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-  }, { token, user });
-
-  await page.goto('/projects');
-
-  return { token, user };
+import { Page, APIRequestContext, request } from '@playwright/test';
+export function env() {
+  return {
+    apiBase: process.env.E2E_API_BASE || 'http://127.0.0.1:4000',
+    baseURL: process.env.E2E_BASE_URL || 'http://127.0.0.1:3000',
+    adminEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
+    adminPass: process.env.ADMIN_PASS || 'Admin123!',
+    memberEmail: process.env.MEMBER_EMAIL || 'member@example.com',
+    memberPass: process.env.MEMBER_PASS || 'Member123!'
+  };
 }
-
-/**
- * Reads API base URL for tests.
- */
-export function getEnv() {
-  const apiBase = process.env.E2E_API_BASE || 'http://127.0.0.1:4000';
-  return { apiBase };
+export async function loginAs(page: Page, email: string, password: string, apiBase: string) {
+  const ctx: APIRequestContext = await request.newContext();
+  const resp = await ctx.post(`${apiBase}/auth/login`, { data: { email, password } });
+  if (!resp.ok()) throw new Error(`Login failed ${resp.status()} ${await resp.text()}`);
+  const { token, user } = await resp.json();
+  await page.addInitScript(([t, u]) => {
+    localStorage.setItem('auth', JSON.stringify({ token: t, user: u }));
+  }, [token, user]);
 }
