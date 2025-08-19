@@ -5,7 +5,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "e2e:deps": "bash ../tools/install_playwright_deps.sh",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "pree2e": "npm run e2e:deps"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -13,6 +17,7 @@
     "react-router-dom": "^6.23.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "react-scripts": "5.0.1"
   },
   "browserslist": {
