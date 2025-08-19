@@ -1,23 +1,53 @@
 // Task model definition
+// Represents an actionable item within a project or milestone
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
-const Project = require('./Project');
-const Milestone = require('./Milestone');
-const User = require('./User');
 
-const Task = sequelize.define('Task', {
-  title: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.TEXT },
-  status: { type: DataTypes.STRING, defaultValue: 'pending' },
-  dueDate: { type: DataTypes.DATE }
-});
+module.exports = (sequelize) => {
+  const Task = sequelize.define('Task', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: 'References the owning project',
+    },
+    milestoneId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Optional link to a milestone',
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM('todo', 'in_progress', 'done'),
+      allowNull: false,
+      defaultValue: 'todo',
+    },
+    assignedUserId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'User assigned to this task',
+    },
+    dueDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+  }, {
+    indexes: [
+      { fields: ['projectId'] },
+      { fields: ['milestoneId'] },
+      { fields: ['assignedUserId'] },
+    ],
+  });
 
-// Relationships
-Project.hasMany(Task, { foreignKey: 'projectId' });
-Task.belongsTo(Project, { foreignKey: 'projectId' });
-Milestone.hasMany(Task, { foreignKey: 'milestoneId' });
-Task.belongsTo(Milestone, { foreignKey: 'milestoneId' });
-User.hasMany(Task, { foreignKey: 'assignedUserId' });
-Task.belongsTo(User, { as: 'assignedUser', foreignKey: 'assignedUserId' });
-
-module.exports = Task;
+  return Task;
+};
