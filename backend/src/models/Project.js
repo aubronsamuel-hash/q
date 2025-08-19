@@ -1,12 +1,31 @@
 // Project model definition
+// Represents a project container for tasks and milestones
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
 
-const Project = sequelize.define('Project', {
-  name: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.TEXT },
-  startDate: { type: DataTypes.DATE },
-  dueDate: { type: DataTypes.DATE }
-});
+module.exports = (sequelize) => {
+  const Project = sequelize.define('Project', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    startDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    dueDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+  });
 
-module.exports = Project;
+  return Project;
+};
