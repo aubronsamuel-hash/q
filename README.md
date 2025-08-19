@@ -7,6 +7,14 @@ This repository contains a minimal, production-ready scaffold split into two fol
 
 ## Backend
 
+### Quick start
+
+- Copy `.env.example` to `.env`
+- Use the default `DATABASE_URL` to connect to the local Docker PostgreSQL
+- Start the database: `docker compose up -d`
+- Run: `npm run dev`
+- Visit: [http://localhost:4000/health](http://localhost:4000/health)
+
 1. Navigate to the backend folder:
    ```bash
    cd backend
@@ -43,7 +51,7 @@ Promote an existing account to administrator with a direct SQL query or the help
 **SQL (PostgreSQL):**
 
 ```sql
-UPDATE "Users" SET role='admin' WHERE email='user@example.com';
+update "Users" set role='admin' where email='admin@example.com';
 ```
 
 **NPM script:**
@@ -83,3 +91,116 @@ Create a `.env` file with:
 - `REACT_APP_API_URL` – base URL of the backend API (e.g. `http://localhost:4000`)
 
 Both applications use environment variables and are ready for further development.
+
+## Smoke Test
+
+### Commands
+
+Backend:
+```
+npm ci
+npm run dev
+```
+or
+```
+npm run start
+Invoke-WebRequest http://localhost:4000/health
+```
+
+Frontend:
+```
+setx REACT_APP_API_URL "http://localhost:4000"
+# open new terminal
+npm ci
+npm start
+```
+
+Tests:
+```
+setx API_BASE_URL "http://localhost:4000"
+powershell -ExecutionPolicy Bypass -File C:\\Users\\SAM\\test_api.ps1
+```
+
+### Checklist
+
+- /health returns status ok
+- test_api.ps1 completes with project cost JSON
+- Front: login admin, create project, add task, member logs time, totals visible
+
+## Dockerized Postgres
+
+Start a local PostgreSQL container:
+
+```
+docker compose up -d
+docker compose ps
+docker compose logs -f postgres
+```
+
+## Local run
+
+```
+cp .env.example .env   # keep DATABASE_URL as docker localhost URL
+npm ci
+npm run db:up
+npm run dev
+curl http://localhost:4000/health
+```
+
+## Troubleshooting: ECONNREFUSED
+
+```
+docker compose ps           # postgres must be healthy
+docker compose logs -f postgres  # check for crash loops
+netstat -ano | findstr :5432
+psql -h localhost -p 5432 -U postgres -d pm_app -c "\l"
+```
+If running outside Docker, update `DATABASE_URL` host/port accordingly. On WSL or Codespaces, use `127.0.0.1` and ensure port mapping.
+
+## Run without Docker
+
+1. Copy `.env.example` to `.env`.
+
+**Option A (SQLite):**
+
+```
+set USE_SQLITE=1
+npm run dev:sqlite
+```
+
+**Option B (Postgres native):**
+
+```
+set DATABASE_URL=postgres://postgres:YOUR_PASSWORD@localhost:5432/pm_app
+npm run dev
+```
+
+Check:
+
+```
+curl http://localhost:4000/health
+```
+
+### Postgres native (Windows)
+
+- Install PostgreSQL 15
+- Create database:
+
+  ```
+  psql -U postgres -h localhost -c "CREATE DATABASE pm_app;"
+  ```
+- Example `.env`:
+
+  ```
+  DATABASE_URL=postgres://postgres:YOUR_PASSWORD@localhost:5432/pm_app
+  JWT_SECRET=dev_jwt_secret
+  PORT=4000
+  ```
+- Start API:
+
+  ```
+  npm ci
+  npm run dev
+  ```
+- Troubleshooting: ECONNREFUSED -> check service, firewall, port 5432
+

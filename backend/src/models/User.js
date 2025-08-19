@@ -1,6 +1,8 @@
 // User model definition
 // Defines application users and roles
 const { DataTypes } = require('sequelize');
+const { dialectName } = require('../config/db');
+const defineEnum = require('../utils/defineEnum');
 
 module.exports = (sequelize) => {
   const User = sequelize.define('User', {
@@ -25,7 +27,7 @@ module.exports = (sequelize) => {
       comment: 'Hashed user password',
     },
     role: {
-      type: DataTypes.ENUM('admin', 'user'),
+      ...defineEnum(dialectName, ['admin', 'user']),
       allowNull: false,
       defaultValue: 'user',
     },

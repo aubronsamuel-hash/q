@@ -8,6 +8,7 @@ const taskRoutes = require('./routes/tasks');
 const milestoneRoutes = require('./routes/milestones');
 const timeLogRoutes = require('./routes/timelogs');
 const authMiddleware = require('./middleware/auth');
+const { sequelize, dialectName } = require('./config/db');
 
 const app = express();
 
@@ -17,9 +18,18 @@ app.use(cors());
 // Parse incoming JSON bodies
 app.use(express.json());
 
-// Simple health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+// Health check endpoint with DB ping
+app.get('/health', async (req, res) => {
+  try {
+    // race against a short timeout to keep the check fast
+    await Promise.race([
+      sequelize.authenticate(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000)),
+    ]);
+    res.json({ status: 'ok', db: 'up', dialect: dialectName });
+  } catch (_err) {
+    res.status(503).json({ status: 'degraded', db: 'down', dialect: dialectName });
+  }
 });
 
 // Public auth routes
