@@ -1,6 +1,8 @@
 // Task model definition
 // Represents an actionable item within a project or milestone
 const { DataTypes } = require('sequelize');
+const { dialectName } = require('../config/db');
+const defineEnum = require('../utils/defineEnum');
 
 module.exports = (sequelize) => {
   const Task = sequelize.define('Task', {
@@ -28,7 +30,7 @@ module.exports = (sequelize) => {
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM('todo', 'in_progress', 'done'),
+      ...defineEnum(dialectName, ['todo', 'in_progress', 'done']),
       allowNull: false,
       defaultValue: 'todo',
     },
