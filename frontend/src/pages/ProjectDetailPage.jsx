@@ -6,17 +6,17 @@ import { apiFetch } from '../api';
 // Project detail with tasks, milestones and cost summary
 function ProjectDetailPage() {
   const { id } = useParams();
-  const { token, user } = useContext(AuthContext);
+  const { token, user, logout } = useContext(AuthContext);
   const [project, setProject] = useState(null);
   const [cost, setCost] = useState({ totalHours: 0, totalCost: 0 });
   const [timeEntry, setTimeEntry] = useState({});
 
   const loadData = async () => {
     try {
-      const resProj = await apiFetch(`/projects/${id}`, {}, token);
+      const resProj = await apiFetch(`/projects/${id}`, {}, token, logout);
       const projData = await resProj.json();
       setProject(projData);
-      const resCost = await apiFetch(`/projects/${id}/cost`, {}, token);
+      const resCost = await apiFetch(`/projects/${id}/cost`, {}, token, logout);
       const costData = await resCost.json();
       setCost(costData);
     } catch (err) {
@@ -37,7 +37,8 @@ function ProjectDetailPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status })
         },
-        token
+        token,
+        logout
       );
       loadData();
     } catch (err) {
@@ -55,7 +56,8 @@ function ProjectDetailPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ hours: entry.hours, date: entry.date })
         },
-        token
+        token,
+        logout
       );
       setTimeEntry({ ...timeEntry, [taskId]: { hours: '', date: '' } });
       loadData();

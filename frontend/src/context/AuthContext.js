@@ -27,8 +27,11 @@ export function AuthProvider({ children }) {
     setUser(newUser || null);
   };
 
+  // Helper to clear auth state
+  const logout = () => setAuth({});
+
   return (
-    <AuthContext.Provider value={{ user, token, setAuth }}>
+    <AuthContext.Provider value={{ user, token, setAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );

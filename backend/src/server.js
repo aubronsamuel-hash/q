@@ -4,7 +4,8 @@ const app = require('./app');
 const { sequelize } = require('./config/db');
 const { initModels, syncDb } = require('./models');
 
-const PORT = process.env.PORT || 3000;
+// Use PORT from environment or fall back to 4000
+const PORT = process.env.PORT || 4000;
 
 async function start() {
   try {

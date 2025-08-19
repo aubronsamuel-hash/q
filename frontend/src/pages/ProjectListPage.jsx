@@ -5,13 +5,13 @@ import { apiFetch } from '../api';
 
 // Page listing projects and allowing admins to create new ones
 function ProjectListPage() {
-  const { token, user } = useContext(AuthContext);
+  const { token, user, logout } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState('');
 
   const loadProjects = async () => {
     try {
-      const res = await apiFetch('/projects', {}, token);
+      const res = await apiFetch('/projects', {}, token, logout);
       const data = await res.json();
       setProjects(data);
     } catch (err) {
@@ -33,7 +33,8 @@ function ProjectListPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name })
         },
-        token
+        token,
+        logout
       );
       setName('');
       loadProjects();
