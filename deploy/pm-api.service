@@ -1,0 +1,14 @@
+[Unit]
+Description=Project Management API
+After=network.target
+
+[Service]
+Type=simple
+User=pm
+EnvironmentFile=/opt/pm/backend/.env
+WorkingDirectory=/opt/pm/backend
+ExecStart=/usr/bin/node /opt/pm/backend/src/server.js
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

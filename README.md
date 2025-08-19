@@ -207,12 +207,69 @@ curl http://localhost:4000/health
 
 ## Playwright dependencies
 
+Install system libraries and Chromium:
+
 ```bash
 chmod +x tools/install_playwright_deps.sh && bash tools/install_playwright_deps.sh
 ```
 
 ## Run Playwright tests
 
+Ensure the backend and frontend are running, then use the system Chromium:
+
 ```bash
+export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+export PW_CHROMIUM_PATH="$(which chromium || which chromium-browser || which google-chrome)"
 npm --prefix frontend run e2e
 ```
+
+Alternatively, run the helper script which installs dependencies, starts services, and executes the E2E suite:
+
+```bash
+./run_all_e2e_nodownload.sh
+```
+
+## Production deployment (systemd + Nginx)
+
+1. Create a dedicated user and directories:
+   ```bash
+   sudo useradd --system --home /opt/pm pm
+   sudo mkdir -p /opt/pm/backend /opt/pm/frontend
+   ```
+2. Copy backend and frontend folders to `/opt/pm` and install dependencies:
+   ```bash
+   cd /opt/pm/backend && npm ci
+   cd /opt/pm/frontend && npm ci && npm run build
+   ```
+3. Create `/opt/pm/backend/.env` with production values.
+4. Copy unit files and enable services:
+   ```bash
+   sudo cp deploy/pm-api.service /etc/systemd/system/
+   sudo cp deploy/pm-web.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now pm-api pm-web
+   ```
+5. Install Nginx and deploy the config:
+   ```bash
+   sudo cp deploy/nginx.conf /etc/nginx/sites-available/pm.conf
+   sudo ln -s /etc/nginx/sites-available/pm.conf /etc/nginx/sites-enabled/pm.conf
+   sudo systemctl reload nginx
+   ```
+6. Test the deployment:
+   ```bash
+   curl https://your-domain/health
+   ```
+
+## Migrate from SQLite to Postgres
+
+1. Export the existing SQLite data:
+   ```bash
+   USE_SQLITE=1 node scripts/exportSqlite.js
+   ```
+   This creates `data/export-YYYYMMDD.json`.
+2. Update `.env` with `DATABASE_URL` pointing to Postgres and run migrations.
+3. Import the JSON into Postgres:
+   ```bash
+   node scripts/importPostgres.js data/export-YYYYMMDD.json
+   ```
+4. Verify table counts to ensure the migration succeeded.
