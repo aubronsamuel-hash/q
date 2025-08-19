@@ -1,9 +1,12 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { API_BASE_URL } from '../api';
 
+// Login form page
 function LoginPage() {
-  const { setToken } = useContext(AuthContext);
+  const { setAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -17,7 +20,9 @@ function LoginPage() {
       });
       const data = await res.json();
       if (data.token) {
-        setToken(data.token);
+        // Save token and user then navigate to projects list
+        setAuth({ token: data.token, user: data.user });
+        navigate('/projects');
       }
     } catch (err) {
       console.error(err);
