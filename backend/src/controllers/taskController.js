@@ -59,6 +59,19 @@ exports.updateTask = async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
+    if (req.user.role !== 'admin') {
+      // Non-admins may only update status on their own tasks
+      if (task.assignedUserId !== req.user.id) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+      const { status } = req.body;
+      if (status === undefined) {
+        return res.status(400).json({ message: 'Status is required' });
+      }
+      await task.update({ status });
+      return res.json(task);
+    }
+    // Admins can update any field
     const { title, description, status, milestoneId, assignedUserId, dueDate } = req.body;
     const updates = {};
     if (title !== undefined) updates.title = title;

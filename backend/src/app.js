@@ -2,10 +2,12 @@
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 const milestoneRoutes = require('./routes/milestones');
 const timeLogRoutes = require('./routes/timelogs');
+const authMiddleware = require('./middleware/auth');
 
 const app = express();
 
@@ -14,6 +16,12 @@ app.use(cors());
 
 // Parse incoming JSON bodies
 app.use(express.json());
+
+// Public auth routes
+app.use('/auth', authRoutes);
+
+// Apply authentication to all routes below
+app.use(authMiddleware);
 
 // Register API routes
 app.use('/projects', projectRoutes);
@@ -29,4 +37,3 @@ app.use((err, req, res, _next) => {
 });
 
 module.exports = app;
-

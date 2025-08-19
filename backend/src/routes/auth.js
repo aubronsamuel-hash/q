@@ -1,17 +1,12 @@
 // Authentication routes
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/authController');
 
-// POST /auth/register
-router.post('/register', (req, res) => {
-  // TODO: implement user registration
-  res.json({ message: 'Register endpoint' });
-});
+// POST /auth/register -> create a new user
+router.post('/register', authController.register);
 
-// POST /auth/login
-router.post('/login', (req, res) => {
-  // TODO: implement user login
-  res.json({ message: 'Login endpoint' });
-});
+// POST /auth/login -> login and receive JWT token
+router.post('/login', authController.login);
 
 module.exports = router;
