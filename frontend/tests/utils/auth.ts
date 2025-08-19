@@ -28,6 +28,6 @@ export async function loginAs(
  * Reads API base URL for tests.
  */
 export function getEnv() {
-  const apiBase = process.env.E2E_API_BASE || 'http://localhost:4000';
+  const apiBase = process.env.E2E_API_BASE || 'http://127.0.0.1:4000';
   return { apiBase };
 }

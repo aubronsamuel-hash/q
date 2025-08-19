@@ -204,3 +204,15 @@ curl http://localhost:4000/health
   ```
 - Troubleshooting: ECONNREFUSED -> check service, firewall, port 5432
 
+
+## Playwright dependencies
+
+```bash
+chmod +x tools/install_playwright_deps.sh && bash tools/install_playwright_deps.sh
+```
+
+## Run Playwright tests
+
+```bash
+npm --prefix frontend run e2e
+```
