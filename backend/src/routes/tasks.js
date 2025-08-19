@@ -1,12 +1,19 @@
-// Task routes
+// Routes for task operations
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const taskController = require('../controllers/taskController');
 
-// GET /tasks
-router.get('/', auth, (req, res) => {
-  // TODO: list tasks
-  res.json({ message: 'List tasks' });
-});
+// GET /projects/:projectId/tasks -> list tasks for a project
+router.get('/projects/:projectId/tasks', taskController.listTasks);
+
+// POST /projects/:projectId/tasks -> create task for a project
+router.post('/projects/:projectId/tasks', taskController.createTask);
+
+// PATCH /tasks/:id -> update a task
+router.patch('/tasks/:id', taskController.updateTask);
+
+// DELETE /tasks/:id -> remove a task
+router.delete('/tasks/:id', taskController.deleteTask);
 
 module.exports = router;
+

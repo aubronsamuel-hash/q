@@ -1,12 +1,13 @@
-// TimeLog routes
+// Routes for time log operations
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const timeLogController = require('../controllers/timeLogController');
 
-// GET /timelogs
-router.get('/', auth, (req, res) => {
-  // TODO: list time logs
-  res.json({ message: 'List time logs' });
-});
+// GET /tasks/:taskId/timelogs -> list time logs for a task
+router.get('/tasks/:taskId/timelogs', timeLogController.listTimeLogs);
+
+// POST /tasks/:taskId/timelogs -> create time log for a task
+router.post('/tasks/:taskId/timelogs', timeLogController.createTimeLog);
 
 module.exports = router;
+
