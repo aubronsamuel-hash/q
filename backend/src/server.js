@@ -49,7 +49,7 @@ async function start() {
     // await models.sequelize.sync(); // Uncomment if you are not using migrations
 
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server listening on 0.0.0.0:${PORT}`);
+      console.log(`API on ${PORT}`);
     });
   } catch (err) {
     console.error('Startup failed:', err);
