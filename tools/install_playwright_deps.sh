@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 echo "[playwright-deps] installing system packages..."
-apt-get update
+apt-get update -y
 # Try t64 packages first (Debian/Ubuntu recent); fallback to legacy names
 apt-get install -y \
   libatk1.0-0t64 \
@@ -27,6 +27,6 @@ apt-get install -y \
   libxrandr2 \
   libgbm1 \
   libasound2
-echo "[playwright-deps] installing playwright browsers..."
-npx --yes playwright install chromium
+echo "[playwright-deps] installing system chromium..."
+apt-get install -y chromium || apt-get install -y chromium-browser || true
 echo "[playwright-deps] done."
