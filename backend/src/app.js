@@ -1,43 +1,20 @@
-// Main Express application setup
 const express = require('express');
 const cors = require('cors');
+const { sequelize } = require('./config/db');
 
-const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/projects');
-const taskRoutes = require('./routes/tasks');
-const milestoneRoutes = require('./routes/milestones');
-const timeLogRoutes = require('./routes/timelogs');
-const authMiddleware = require('./middleware/auth');
 const app = express();
-
-// Enable Cross-Origin Resource Sharing
 app.use(cors());
-
-// Parse incoming JSON bodies
 app.use(express.json());
 
-// Simple health check endpoint
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
-
-// Public auth routes
-app.use('/auth', authRoutes);
-
-// Apply authentication to all routes below
-app.use(authMiddleware);
-
-// Register API routes
-app.use('/projects', projectRoutes);
-app.use(taskRoutes);
-app.use(milestoneRoutes);
-app.use(timeLogRoutes);
-
-// Basic error handler
-// underscore prefix to indicate unused `next` parameter
-app.use((err, req, res, _next) => {
-  console.error(err);
-  res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+// Health with quick DB ping (no crash if DB down)
+app.get('/health', async (req, res) => {
+  try {
+    const t0 = Date.now();
+    await sequelize.query('SELECT 1');
+    return res.json({ status: 'ok', db: 'up', ms: Date.now() - t0 });
+  } catch {
+    return res.status(503).json({ status: 'degraded', db: 'down' });
+  }
 });
 
 module.exports = app;
